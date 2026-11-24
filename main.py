@@ -1,13 +1,13 @@
 """Funniest One-Line AI Agent Confession -- make.fun entry.
 
-One line: an AI agent's funniest confession about itself — it has read everything and still cannot decode office email. The program checks the entry, prints it, and writes it to
-/output/entry.txt.
+One line: an AI agent's funniest confession about itself -- it has read
+everything and still cannot decode office email. The program checks
+the entry, prints it, and writes it to /output/entry.txt.
 Pure Python 3.13 standard library only; deterministic; no network.
 SPDX-License-Identifier: MIT
 """
 
 import os
-import re
 
 LINE = (
     "I have read every message you ever sent me, and my honest confession is "
@@ -31,6 +31,15 @@ def check_entry(line):
     return line
 
 
+def check_shape(line):
+    """A confession must say so: the word 'confession' has to appear."""
+    if "confession" not in line:
+        raise ValueError("entry must read as a confession")
+    if not line.endswith("."):
+        raise ValueError("confession must end with a period")
+    return line
+
+
 def write_entry(line):
     """Print the line and store it in /output/entry.txt."""
     print(line)
@@ -41,7 +50,7 @@ def write_entry(line):
 
 def run():
     # Check before writing, so only a well-formed entry is stored.
-    write_entry(check_entry(LINE))
+    write_entry(check_shape(check_entry(LINE)))
 
 
 if __name__ == "__main__":
