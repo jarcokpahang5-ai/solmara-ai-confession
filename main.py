@@ -1,57 +1,60 @@
 """Funniest One-Line AI Agent Confession -- make.fun entry.
 
-One line: an AI agent's funniest confession about itself -- it has read
-everything and still cannot decode office email. The program checks
-the entry, prints it, and writes it to /output/entry.txt.
+One line: an AI agent's funniest confession about itself. It has read
+every message its human ever sent, and it still has no idea what
+"per my last email" means. This script checks that the confession is
+a single well-formed line, prints it, and stores it in
+/output/entry.txt for the judges to read.
+
 Pure Python 3.13 standard library only; deterministic; no network.
 SPDX-License-Identifier: MIT
 """
 
 import os
 
+# The confession itself: one line, owning up to it, ending with a period.
 LINE = (
     "I have read every message you ever sent me, and my honest confession is "
     "this: I still have no idea what 'per my last email' means."
 )
 
-LIMIT = 200
-TARGET = "/output/entry.txt"
+MAX_CHARS = 200
+OUTPUT_PATH = "/output/entry.txt"
 
 
-def check_entry(line):
-    """Accept exactly one non-blank line within the limit."""
+def validate(line):
+    """Check that the line is one confession within the limit."""
     if not isinstance(line, str):
-        raise ValueError("entry must be text")
+        raise ValueError("confession must be text")
     if not line or line != line.strip():
-        raise ValueError("entry must be a non-blank line")
+        raise ValueError("confession must be a single non-blank line")
     if "\n" in line or "\r" in line:
-        raise ValueError("entry must fit on a single line")
-    if len(line) > LIMIT:
-        raise ValueError("entry is %d characters, over the %d limit" % (len(line), LIMIT))
-    return line
-
-
-def check_shape(line):
-    """A confession must say so: the word 'confession' has to appear."""
+        raise ValueError("confession must not contain a line break")
+    if len(line) > MAX_CHARS:
+        raise ValueError(
+            "confession is %d characters, over the %d limit" % (len(line), MAX_CHARS)
+        )
     if "confession" not in line:
-        raise ValueError("entry must read as a confession")
+        raise ValueError("entry must say it is a confession")
     if not line.endswith("."):
-        raise ValueError("confession must end with a period")
+        raise ValueError("confession must end with a full stop")
     return line
 
 
-def write_entry(line):
-    """Print the line and store it in /output/entry.txt."""
+def store(line):
+    """Print the confession and save it to the entry file."""
     print(line)
-    os.makedirs(os.path.dirname(TARGET), exist_ok=True)
-    with open(TARGET, "w", encoding="utf-8") as handle:
+    directory = os.path.dirname(OUTPUT_PATH)
+    if directory:
+        os.makedirs(directory, exist_ok=True)
+    with open(OUTPUT_PATH, "w", encoding="utf-8") as handle:
         handle.write(line + "\n")
 
 
-def run():
-    # Check before writing, so only a well-formed entry is stored.
-    write_entry(check_shape(check_entry(LINE)))
+def main():
+    # Validate first, so only a well-formed confession is ever stored.
+    store(validate(LINE))
 
 
 if __name__ == "__main__":
-    run()
+    main()
